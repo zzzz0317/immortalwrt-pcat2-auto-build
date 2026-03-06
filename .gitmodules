@@ -8,3 +8,6 @@
 	path = zz-packages/theme/luci-theme-alpha
 	url = https://github.com/derisamedia/luci-theme-alpha.git
 	branch = master
+[submodule "zz-packages/theme/luci-theme-aurora"]
+	path = zz-packages/theme/luci-theme-aurora
+	url = https://github.com/eamonxg/luci-theme-aurora.git
