@@ -38,6 +38,9 @@ uci commit bandix
 uci -q set zz_config.@status[0].first_boot=0
 uci commit zz_config
 
+/etc/init.d/pcat2-display-mini enable
+/etc/init.d/pcat2-display-mini start
+
 fi
 
 uci set argon.@global[0].mode='dark'
