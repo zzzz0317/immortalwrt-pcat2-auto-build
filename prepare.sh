@@ -47,8 +47,6 @@ else
     echo "Created symlink package/zz-packages -> ../../zz-packages"
 fi
 
-bash -c "cd package/zz-packages/theme/luci-theme-alpha && git reset --hard && sed -i 's/^\(PKG_VERSION:=[^[:space:]]*\)-beta$/\1/' Makefile"
-
 echo "Fix Rust build remove CI LLVM download"
 if [ -f "feeds/packages/lang/rust/Makefile" ]; then
     sed -i 's/download-ci-llvm=true/download-ci-llvm=false/g' "feeds/packages/lang/rust/Makefile"
