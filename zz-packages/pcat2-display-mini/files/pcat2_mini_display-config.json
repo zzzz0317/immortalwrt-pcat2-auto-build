@@ -2,9 +2,9 @@
     "ping_site0": "www.baidu.com",
     "ping_site1": "119.29.29.29",
     "show_sms": false,
-    "screen_dimmer_time_on_battery_seconds": 60,
-    "screen_dimmer_time_on_dc_seconds": 600,
-    "screen_max_brightness": 100,
+    "screen_dimmer_time_on_battery_seconds": 30,
+    "screen_dimmer_time_on_dc_seconds": 300,
+    "screen_max_brightness": 66,
     "screen_min_brightness": 0,
     "display_template": {
         "elements": {
