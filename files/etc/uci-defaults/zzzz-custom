@@ -27,11 +27,54 @@ uci commit
 
 sed -i '/qmodem/d' /etc/apk/repositories.d/distfeeds.list
 
+uci set fstab.@global[0].anon_mount='0'
+
+STOR_DEV_FIRST="/dev/mmcblk1p1"
+STOR_DEV_FIRST_MOUNT="/mnt/mmcblk1p1"
+STOR_DEV_SECOND="/dev/mmcblk0p3"
+STOR_DEV_SECOND_MOUNT="/mnt/mmcblk0p3"
+
+if [ -b "$STOR_DEV_SECOND" ]; then
+    uci add fstab mount
+    uci set fstab.@mount[-1].enabled='1'
+    uci set fstab.@mount[-1].device="$STOR_DEV_SECOND"
+    uci set fstab.@mount[-1].target="$STOR_DEV_SECOND_MOUNT"
+    STOR_DEV_TO_MOUNT="$STOR_DEV_SECOND"
+    STOR_MOUNT_POINT="$STOR_DEV_SECOND_MOUNT"
+fi
+if [ -b "$STOR_DEV_FIRST" ]; then
+    uci add fstab mount
+    uci set fstab.@mount[-1].enabled='1'
+    uci set fstab.@mount[-1].device="$STOR_DEV_FIRST"
+    uci set fstab.@mount[-1].target="$STOR_DEV_FIRST_MOUNT"
+    STOR_DEV_TO_MOUNT="$STOR_DEV_FIRST"
+    STOR_MOUNT_POINT="$STOR_DEV_FIRST_MOUNT"
+fi
+
+uci commit fstab
+/sbin/block mount
+/bin/sleep 1s
+
+if [ -n "$STOR_DEV_TO_MOUNT" ]; then
+    if [ ! -d "$STOR_MOUNT_POINT/bandix" ]; then
+        mkdir -p "$STOR_MOUNT_POINT/bandix"
+    fi
+    uci set bandix.general.data_dir="$STOR_MOUNT_POINT/bandix"
+    uci commit bandix
+else
+    echo "persistent dev not found" >> /tmp/zz-init.log
+fi
+
+uci del bandix.traffic.traffic_neighbor_flush_interval
 uci set bandix.traffic.enabled='1'
-uci set bandix.traffic.traffic_persist_history='1'
-uci set bandix.traffic.traffic_flush_interval_seconds='300'
+uci set bandix.traffic.traffic_enable_storage='1'
 uci set bandix.connections.enabled='1'
 uci set bandix.dns.enabled='1'
+uci set bandix.dns.dns_enable_storage='1'
+uci set bandix.traffic.traffic_flush_interval='300'
+uci set bandix.dns.dns_flush_interval='300'
+uci set bandix.traffic.traffic_realtime_window='1800'
+
 uci commit bandix
 /etc/init.d/bandix restart
 
