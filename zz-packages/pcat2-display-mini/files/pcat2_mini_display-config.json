@@ -369,16 +369,24 @@
                 },
                 {
                     "type": "fixed_text",
-                    "label": "OS Version",
+                    "label": "Operating System",
                     "position": {"x": 10, "y": 160},
                     "font": "unit",
                     "color": [255, 229, 0],
                     "enable": 1
                 },
                 {
+                    "type": "fixed_text",
+                    "label": "ImmortalWrt by ZZ",
+                    "position": {"x": 10, "y": 178},
+                    "font": "unit",
+                    "color": [255, 229, 255],
+                    "enable": 1
+                },
+                {
                     "type": "text",
                     "label": "OS Version",
-                    "position": {"x": 10, "y": 178},
+                    "position": {"x": 10, "y": 196},
                     "font": "unit",
                     "color": [255, 229, 255],
                     "data_key": "OSVersion",
@@ -387,8 +395,8 @@
                 },
                 {
                     "type": "fixed_text",
-                    "label": "SN",
-                    "position": {"x": 10, "y": 202},
+                    "label": "Serial Number",
+                    "position": {"x": 10, "y": 218},
                     "font": "unit",
                     "color": [255, 229, 0],
                     "enable": 1
@@ -396,7 +404,7 @@
                 {
                     "type": "text",
                     "label": "SN",
-                    "position": {"x": 10, "y": 220},
+                    "position": {"x": 10, "y": 236},
                     "font": "thin",
                     "color": [255, 229, 255],
                     "data_key": "SN",
