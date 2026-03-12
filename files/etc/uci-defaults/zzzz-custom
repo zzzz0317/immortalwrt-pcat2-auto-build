@@ -79,6 +79,12 @@ uci commit bandix
 uci -q set zz_config.@status[0].first_boot=0
 uci commit zz_config
 
+if [ -n "$STOR_INTERNAL_DEVICE" ]; then
+    if [ -f "$STOR_INTERNAL_TARGET/zz-first-boot-script.sh" ]; then
+        "$STOR_INTERNAL_TARGET/zz-first-boot-script.sh" >> $STOR_INTERNAL_TARGET/zz-first-boot-script.log 2>&1
+    fi
+fi
+
 fi
 
 uci set argon.@global[0].mode='dark'
