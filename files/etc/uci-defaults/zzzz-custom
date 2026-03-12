@@ -22,37 +22,40 @@ sed -i '/qmodem/d' /etc/apk/repositories.d/distfeeds.list
 
 uci set fstab.@global[0].anon_mount='0'
 
-STOR_DEV_FIRST="/dev/mmcblk1p1"
-STOR_DEV_FIRST_MOUNT="/mnt/mmcblk1p1"
-STOR_DEV_SECOND="/dev/mmcblk0p3"
-STOR_DEV_SECOND_MOUNT="/mnt/mmcblk0p3"
+STOR_EXTERNAL_DEVICE="/dev/mmcblk1p1"
+STOR_EXTERNAL_TARGET="/mnt/mmcblk1p1"
+STOR_INTERNAL_DEVICE="/dev/mmcblk0p3"
+STOR_INTERNAL_TARGET="/mnt/mmcblk0p3"
 
-if [ -b "$STOR_DEV_SECOND" ]; then
+STOR_SELECTED_DEVICE=""
+STOR_SELECTED_TARGET=""
+
+if [ -b "$STOR_INTERNAL_DEVICE" ]; then
     uci add fstab mount
     uci set fstab.@mount[-1].enabled='1'
-    uci set fstab.@mount[-1].device="$STOR_DEV_SECOND"
-    uci set fstab.@mount[-1].target="$STOR_DEV_SECOND_MOUNT"
-    STOR_DEV_TO_MOUNT="$STOR_DEV_SECOND"
-    STOR_MOUNT_POINT="$STOR_DEV_SECOND_MOUNT"
+    uci set fstab.@mount[-1].device="$STOR_INTERNAL_DEVICE"
+    uci set fstab.@mount[-1].target="$STOR_INTERNAL_TARGET"
+    STOR_SELECTED_DEVICE="$STOR_INTERNAL_DEVICE"
+    STOR_SELECTED_TARGET="$STOR_INTERNAL_TARGET"
 fi
-if [ -b "$STOR_DEV_FIRST" ]; then
+if [ -b "$STOR_EXTERNAL_DEVICE" ]; then
     uci add fstab mount
     uci set fstab.@mount[-1].enabled='1'
-    uci set fstab.@mount[-1].device="$STOR_DEV_FIRST"
-    uci set fstab.@mount[-1].target="$STOR_DEV_FIRST_MOUNT"
-    STOR_DEV_TO_MOUNT="$STOR_DEV_FIRST"
-    STOR_MOUNT_POINT="$STOR_DEV_FIRST_MOUNT"
+    uci set fstab.@mount[-1].device="$STOR_EXTERNAL_DEVICE"
+    uci set fstab.@mount[-1].target="$STOR_EXTERNAL_TARGET"
+    STOR_SELECTED_DEVICE="$STOR_EXTERNAL_DEVICE"
+    STOR_SELECTED_TARGET="$STOR_EXTERNAL_TARGET"
 fi
 
 uci commit fstab
 /sbin/block mount
 /bin/sleep 1s
 
-if [ -n "$STOR_DEV_TO_MOUNT" ]; then
-    if [ ! -d "$STOR_MOUNT_POINT/bandix" ]; then
-        mkdir -p "$STOR_MOUNT_POINT/bandix"
+if [ -n "$STOR_SELECTED_DEVICE" ]; then
+    if [ ! -d "$STOR_SELECTED_TARGET/bandix" ]; then
+        mkdir -p "$STOR_SELECTED_TARGET/bandix"
     fi
-    uci set bandix.general.data_dir="$STOR_MOUNT_POINT/bandix"
+    uci set bandix.general.data_dir="$STOR_SELECTED_TARGET/bandix"
     uci commit bandix
 else
     echo "persistent dev not found" >> /tmp/zz-init.log
