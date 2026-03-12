@@ -1,14 +1,9 @@
 #!/bin/sh
 is_first_boot=`uci -q get zz_config.@status[0].first_boot`
 if test $is_first_boot -gt 0; then
-# uci del dhcp.lan.ra_slaac
-# uci del network.lan.ipaddr
-# uci add_list network.lan.ipaddr='10.0.0.1/24'
-# uci add_list network.lan.ip6class='2_1_2v6'
 
 uci set luci.main.lang='zh_cn'
 uci set luci.main.mediaurlbase='/luci-static/argon'
-# uci set luci.main.mediaurlbase='/luci-static/alpha'
 uci set attendedsysupgrade.client.login_check_for_upgrades='0'
 uci del firewall.@defaults[0].flow_offloading_hw
 
@@ -19,8 +14,6 @@ uci set qmodem.wwan=modem-slot
 uci set qmodem.wwan.type='usb'
 uci set qmodem.wwan.slot='2-1.1'
 uci set qmodem.wwan.alias='wwan'
-# uci set qmodem.main.at_tool='1'
-# uci commit qmodem
 
 uci commit
 /etc/init.d/network reload
@@ -74,15 +67,14 @@ uci set bandix.dns.dns_enable_storage='1'
 uci set bandix.traffic.traffic_flush_interval='300'
 uci set bandix.dns.dns_flush_interval='300'
 uci set bandix.traffic.traffic_realtime_window='1800'
-
 uci commit bandix
 /etc/init.d/bandix restart
 
-uci -q set zz_config.@status[0].first_boot=0
-uci commit zz_config
-
 /etc/init.d/pcat2-display-mini enable
 /etc/init.d/pcat2-display-mini start
+
+uci -q set zz_config.@status[0].first_boot=0
+uci commit zz_config
 
 fi
 
