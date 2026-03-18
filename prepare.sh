@@ -20,6 +20,11 @@ else
     cd immortalwrt
 fi
 
+# reset rust package Makefile
+if [ -f "feeds/packages/lang/rust/Makefile" ]; then
+   bash -c "cd feeds/packages && git checkout -- \"lang/rust/Makefile\""
+fi
+
 echo "add feeds"
 cat feeds.conf.default > feeds.conf
 echo "" >> feeds.conf
@@ -47,7 +52,7 @@ else
     echo "Created symlink package/zz-packages -> ../../zz-packages"
 fi
 
-echo "Fix Rust build remove CI LLVM download"
-if [ -f "feeds/packages/lang/rust/Makefile" ]; then
-    sed -i 's/download-ci-llvm=true/download-ci-llvm=false/g' "feeds/packages/lang/rust/Makefile"
-fi
+# echo "Fix Rust build remove CI LLVM download"
+# if [ -f "feeds/packages/lang/rust/Makefile" ]; then
+#     sed -i 's/download-ci-llvm=true/download-ci-llvm=false/g' "feeds/packages/lang/rust/Makefile"
+# fi
