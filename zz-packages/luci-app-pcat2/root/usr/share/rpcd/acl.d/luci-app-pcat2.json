@@ -1,0 +1,10 @@
+{
+	"luci-app-pcat2": {
+		"description": "Grant access to PCAT2 power status information",
+		"read": {
+			"ubus": {
+				"luci.pcat2": [ "*" ]
+			}
+		}
+	}
+}

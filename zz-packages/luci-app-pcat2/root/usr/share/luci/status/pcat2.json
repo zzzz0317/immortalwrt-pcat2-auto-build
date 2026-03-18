@@ -1,0 +1,7 @@
+{
+	"pcat2": {
+		"title": "PCAT2 电源状态",
+		"description": "PCAT2 设备电源和温度监控信息",
+		"read": "ubus call luci.pcat2 get_all"
+	}
+}

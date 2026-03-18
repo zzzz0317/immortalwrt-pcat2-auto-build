@@ -1,0 +1,197 @@
+<%
+local util = require "luci.util"
+local fs = require "nixio.fs"
+
+-- 读取文件内容，失败返回默认值
+local function read_file(path, default)
+	local f = io.open(path, "r")
+	if f then
+		local content = f:read("*all")
+		f:close()
+		return content or default
+	end
+	return default
+end
+
+-- 读取数值文件
+local function read_int_file(path, default)
+	local content = read_file(path, default)
+	return tonumber(content) or tonumber(default) or 0
+end
+
+-- 格式化函数
+local function format_voltage(uv)
+	return string.format("%.2f V", uv / 1000000)
+end
+
+local function format_current(ua)
+	return string.format("%.3f A", ua / 1000000)
+end
+
+local function format_power(uw)
+	return string.format("%.3f W", uw / 1000000)
+end
+
+local function format_temp(mc)
+	return string.format("%.1f °C", mc / 1000)
+end
+
+local function format_rpm(rpm)
+	return string.format("%d RPM", rpm)
+end
+
+-- 电池信息
+local battery_capacity = read_int_file("/sys/class/power_supply/battery/capacity", "0")
+local battery_current = read_int_file("/sys/class/power_supply/battery/current_now", "0")
+local battery_voltage = read_int_file("/sys/class/power_supply/battery/voltage_now", "0")
+local battery_power = read_int_file("/sys/class/power_supply/battery/power_now", "0")
+
+-- 充电器信息
+local charger_voltage = read_int_file("/sys/class/power_supply/charger/voltage_now", "0")
+local charger_online = read_int_file("/sys/class/power_supply/charger/online", "0")
+
+-- 风扇信息
+local fan_cur_state = read_int_file("/sys/class/thermal/cooling_device0/cur_state", "0")
+local fan_max_state = read_int_file("/sys/class/thermal/cooling_device0/max_state", "0")
+local fan_speed = read_int_file("/sys/class/hwmon/hwmon3/fan1_input", "0")
+
+-- 主板温度
+local mb_temp = read_int_file("/sys/class/hwmon/hwmon2/temp1_input", "0")
+
+-- 背光亮度
+local backlight_brightness = read_int_file("/sys/class/backlight/backlight/brightness", "0")
+
+-- 电池状态颜色
+local battery_color = "#28a745"
+if battery_capacity <= 20 then
+	battery_color = "#dc3545"
+elseif battery_capacity <= 50 then
+	battery_color = "#ffc107"
+end
+
+-- 充电状态
+local charging_status = charger_online == 1 and "充电中" or "未充电"
+
+-- 风扇状态
+local fan_status = string.format("%d / %d 档", fan_cur_state, fan_max_state)
+
+-- 热区信息
+local thermal_zones = {}
+local zone = 0
+while fs.access("/sys/class/thermal/thermal_zone" .. zone) do
+	local zone_info = {
+		type = read_file("/sys/class/thermal/thermal_zone" .. zone .. "/type", "unknown"),
+		temp = read_int_file("/sys/class/thermal/thermal_zone" .. zone .. "/temp", "0"),
+		trip_passive = read_int_file("/sys/class/thermal/thermal_zone" .. zone .. "/trip_point_0_temp", "0"),
+		trip_active = read_int_file("/sys/class/thermal/thermal_zone" .. zone .. "/trip_point_1_temp", "0"),
+		trip_critical = read_int_file("/sys/class/thermal/thermal_zone" .. zone .. "/trip_point_2_temp", "0")
+	}
+	table.insert(thermal_zones, zone_info)
+	zone = zone + 1
+end
+
+-- 电池进度条百分比（供 cbi-progressbar 使用）
+local battery_pct = battery_capacity
+%>
+
+<div class="cbi-section fade-in">
+	<div class="cbi-title"><h3>光影猫电源信息</h3></div>
+	<div>
+		<table class="table">
+			<tr class="tr table-titles">
+				<th class="th" colspan="2">电池</th>
+			</tr>
+			<tr class="tr">
+				<td class="td left" width="33%">电量</td>
+				<td class="td left">
+					<div class="cbi-progressbar" title="<%= battery_capacity %>%">
+						<div style="width:<%= battery_capacity %>.00%;background-color:<%= battery_color %>"></div>
+					</div>
+				</td>
+			</tr>
+			<tr class="tr">
+				<td class="td left" width="33%">状态</td>
+				<td class="td left"><%= charging_status %></td>
+			</tr>
+			<tr class="tr">
+				<td class="td left" width="33%">电压</td>
+				<td class="td left"><%= format_voltage(battery_voltage) %></td>
+			</tr>
+			<tr class="tr">
+				<td class="td left" width="33%">电流</td>
+				<td class="td left"><%= format_current(battery_current) %></td>
+			</tr>
+			<tr class="tr">
+				<td class="td left" width="33%">功率</td>
+				<td class="td left"><%= format_power(battery_power) %></td>
+			</tr>
+		</table>
+
+		<table class="table" style="margin-top:1em">
+			<tr class="tr table-titles">
+				<th class="th" colspan="2">充电器</th>
+			</tr>
+			<tr class="tr">
+				<td class="td left" width="33%">在线状态</td>
+				<td class="td left"><%= charging_status %></td>
+			</tr>
+			<tr class="tr">
+				<td class="td left" width="33%">电压</td>
+				<td class="td left"><%= format_voltage(charger_voltage) %></td>
+			</tr>
+		</table>
+
+		<table class="table" style="margin-top:1em">
+			<tr class="tr table-titles">
+				<th class="th" colspan="2">风扇</th>
+			</tr>
+			<tr class="tr">
+				<td class="td left" width="33%">档位</td>
+				<td class="td left"><%= fan_status %></td>
+			</tr>
+			<tr class="tr">
+				<td class="td left" width="33%">转速</td>
+				<td class="td left"><%= format_rpm(fan_speed) %></td>
+			</tr>
+		</table>
+
+		<table class="table" style="margin-top:1em">
+			<tr class="tr table-titles">
+				<th class="th" colspan="2">温度与背光</th>
+			</tr>
+			<tr class="tr">
+				<td class="td left" width="33%">主板温度</td>
+				<td class="td left"><%= format_temp(mb_temp) %></td>
+			</tr>
+			<tr class="tr">
+				<td class="td left" width="33%">背光亮度</td>
+				<td class="td left"><%= backlight_brightness %></td>
+			</tr>
+		</table>
+
+		<table class="table" style="margin-top:1em">
+			<tr class="tr table-titles">
+				<th class="th">热区</th>
+				<th class="th">当前温度</th>
+				<th class="th">被动阈值</th>
+				<th class="th">主动阈值</th>
+				<th class="th">临界阈值</th>
+			</tr>
+			<% if #thermal_zones > 0 then %>
+				<% for i, zone in ipairs(thermal_zones) do %>
+					<tr class="tr">
+						<td class="td left">Zone <%= i-1 %> (<%= zone.type %>)</td>
+						<td class="td left"><%= format_temp(zone.temp) %></td>
+						<td class="td left"><%= zone.trip_passive > 0 and format_temp(zone.trip_passive) or "-" %></td>
+						<td class="td left"><%= zone.trip_active > 0 and format_temp(zone.trip_active) or "-" %></td>
+						<td class="td left"><%= zone.trip_critical > 0 and format_temp(zone.trip_critical) or "-" %></td>
+					</tr>
+				<% end %>
+			<% else %>
+				<tr class="tr">
+					<td class="td left" colspan="5">热区信息不可用</td>
+				</tr>
+			<% end %>
+		</table>
+	</div>
+</div>

@@ -1,0 +1,243 @@
+#!/bin/sh
+# Copyright (C) 2026 zzzz0317 <github-pcat2@zhangzhe.net>
+
+. /usr/share/libubox/jshn.sh
+
+# 通用函数：读取文件内容，失败返回默认值
+read_file_value() {
+	local file="$1"
+	local default="$2"
+	if [ -f "$file" ]; then
+		cat "$file" 2>/dev/null || echo "$default"
+	else
+		echo "$default"
+	fi
+}
+
+# 通用函数：创建JSON响应
+make_json_response() {
+	json_init
+	[ -n "$1" ] && json_add_string "error" "$1"
+	json_dump
+	json_cleanup
+}
+
+# 获取电池信息
+get_battery_info() {
+	json_init
+
+	# 电池容量 (%)
+	local capacity=$(read_file_value "/sys/class/power_supply/battery/capacity" "0")
+	json_add_int "capacity" "$capacity"
+
+	# 电流 (µA)
+	local current_now=$(read_file_value "/sys/class/power_supply/battery/current_now" "0")
+	json_add_int "current_now" "$current_now"
+
+	# 电压 (µV)
+	local voltage_now=$(read_file_value "/sys/class/power_supply/battery/voltage_now" "0")
+	json_add_int "voltage_now" "$voltage_now"
+
+	# 功率 (µW)
+	local power_now=$(read_file_value "/sys/class/power_supply/battery/power_now" "0")
+	json_add_int "power_now" "$power_now"
+
+	json_dump
+	json_cleanup
+}
+
+# 获取充电器信息
+get_charger_info() {
+	json_init
+
+	# 充电器电压 (µV)
+	local voltage_now=$(read_file_value "/sys/class/power_supply/charger/voltage_now" "0")
+	json_add_int "voltage_now" "$voltage_now"
+
+	# 充电器在线状态
+	local online=$(read_file_value "/sys/class/power_supply/charger/online" "0")
+	json_add_int "online" "$online"
+
+	json_dump
+	json_cleanup
+}
+
+# 获取风扇信息
+get_fan_info() {
+	json_init
+
+	# 风扇当前档位
+	local cur_state=$(read_file_value "/sys/class/thermal/cooling_device0/cur_state" "0")
+	json_add_int "cur_state" "$cur_state"
+
+	# 风扇最大档位
+	local max_state=$(read_file_value "/sys/class/thermal/cooling_device0/max_state" "0")
+	json_add_int "max_state" "$max_state"
+
+	# 风扇转速 (RPM)
+	local fan_speed=$(read_file_value "/sys/class/hwmon/hwmon3/fan1_input" "0")
+	json_add_int "fan_speed" "$fan_speed"
+
+	json_dump
+	json_cleanup
+}
+
+# 获取主板温度
+get_mb_temp() {
+	json_init
+
+	# 主板温度 (m°C)
+	local temp=$(read_file_value "/sys/class/hwmon/hwmon2/temp1_input" "0")
+	json_add_int "temp" "$temp"
+
+	json_dump
+	json_cleanup
+}
+
+# 获取背光亮度
+get_backlight() {
+	json_init
+
+	# 背光亮度
+	local brightness=$(read_file_value "/sys/class/backlight/backlight/brightness" "0")
+	json_add_int "brightness" "$brightness"
+
+	json_dump
+	json_cleanup
+}
+
+# 获取所有热区信息
+get_thermal_zones() {
+	json_init
+	json_add_array "thermal_zones"
+
+	local zone=0
+	while [ -d "/sys/class/thermal/thermal_zone${zone}" ]; do
+		json_add_object
+
+		# 热区类型
+		local type=$(read_file_value "/sys/class/thermal/thermal_zone${zone}/type" "unknown")
+		json_add_string "type" "$type"
+
+		# 当前温度 (m°C)
+		local temp=$(read_file_value "/sys/class/thermal/thermal_zone${zone}/temp" "0")
+		json_add_int "temp" "$temp"
+
+		# 被动温度阈值 (m°C)
+		local trip_point_0_passive=$(read_file_value "/sys/class/thermal/thermal_zone${zone}/trip_point_0_temp" "0")
+		json_add_int "trip_point_passive" "$trip_point_0_passive"
+
+		# 主动温度阈值 (m°C)
+		local trip_point_0_active=$(read_file_value "/sys/class/thermal/thermal_zone${zone}/trip_point_1_temp" "0")
+		json_add_int "trip_point_active" "$trip_point_0_active"
+
+		# 临界温度阈值 (m°C)
+		local trip_point_0_critical=$(read_file_value "/sys/class/thermal/thermal_zone${zone}/trip_point_2_temp" "0")
+		json_add_int "trip_point_critical" "$trip_point_0_critical"
+
+		json_close_object
+		zone=$((zone + 1))
+	done
+
+	json_close_array
+	json_dump
+	json_cleanup
+}
+
+# 获取所有电源信息
+get_all_power_info() {
+	json_init
+
+	# 电池信息
+	json_add_object "battery"
+	local capacity=$(read_file_value "/sys/class/power_supply/battery/capacity" "0")
+	local current_now=$(read_file_value "/sys/class/power_supply/battery/current_now" "0")
+	local voltage_now=$(read_file_value "/sys/class/power_supply/battery/voltage_now" "0")
+	local power_now=$(read_file_value "/sys/class/power_supply/battery/power_now" "0")
+	json_add_int "capacity" "$capacity"
+	json_add_int "current_now" "$current_now"
+	json_add_int "voltage_now" "$voltage_now"
+	json_add_int "power_now" "$power_now"
+	json_close_object
+
+	# 充电器信息
+	json_add_object "charger"
+	local charger_voltage=$(read_file_value "/sys/class/power_supply/charger/voltage_now" "0")
+	local charger_online=$(read_file_value "/sys/class/power_supply/charger/online" "0")
+	json_add_int "voltage_now" "$charger_voltage"
+	json_add_int "online" "$charger_online"
+	json_close_object
+
+	# 风扇信息
+	json_add_object "fan"
+	local fan_cur_state=$(read_file_value "/sys/class/thermal/cooling_device0/cur_state" "0")
+	local fan_max_state=$(read_file_value "/sys/class/thermal/cooling_device0/max_state" "0")
+	local fan_speed=$(read_file_value "/sys/class/hwmon/hwmon3/fan1_input" "0")
+	json_add_int "cur_state" "$fan_cur_state"
+	json_add_int "max_state" "$fan_max_state"
+	json_add_int "fan_speed" "$fan_speed"
+	json_close_object
+
+	# 主板温度
+	json_add_object "motherboard"
+	local mb_temp=$(read_file_value "/sys/class/hwmon/hwmon2/temp1_input" "0")
+	json_add_int "temp" "$mb_temp"
+	json_close_object
+
+	# 背光亮度
+	json_add_object "backlight"
+	local brightness=$(read_file_value "/sys/class/backlight/backlight/brightness" "0")
+	json_add_int "brightness" "$brightness"
+	json_close_object
+
+	# 热区信息
+	json_add_array "thermal_zones"
+	local zone=0
+	while [ -d "/sys/class/thermal/thermal_zone${zone}" ]; do
+		json_add_object
+		local type=$(read_file_value "/sys/class/thermal/thermal_zone${zone}/type" "unknown")
+		local temp=$(read_file_value "/sys/class/thermal/thermal_zone${zone}/temp" "0")
+		local trip_passive=$(read_file_value "/sys/class/thermal/thermal_zone${zone}/trip_point_0_temp" "0")
+		local trip_active=$(read_file_value "/sys/class/thermal/thermal_zone${zone}/trip_point_1_temp" "0")
+		local trip_critical=$(read_file_value "/sys/class/thermal/thermal_zone${zone}/trip_point_2_temp" "0")
+		json_add_string "type" "$type"
+		json_add_int "temp" "$temp"
+		json_add_int "trip_point_passive" "$trip_passive"
+		json_add_int "trip_point_active" "$trip_active"
+		json_add_int "trip_point_critical" "$trip_critical"
+		json_close_object
+		zone=$((zone + 1))
+	done
+	json_close_array
+
+	json_dump
+	json_cleanup
+}
+
+# 主路由处理
+case "$1" in
+	get_battery)
+		get_battery_info
+		;;
+	get_charger)
+		get_charger_info
+		;;
+	get_fan)
+		get_fan_info
+		;;
+	get_mb_temp)
+		get_mb_temp
+		;;
+	get_backlight)
+		get_backlight
+		;;
+	get_thermal_zones)
+		get_thermal_zones
+		;;
+	get_all)
+		get_all_power_info
+		;;
+	*)
+		make_json_response "Invalid method"
+		;;
+esac
