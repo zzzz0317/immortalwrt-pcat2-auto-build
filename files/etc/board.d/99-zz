@@ -3,7 +3,7 @@
 board_config_update
 
 ucidef_set_hostname "zzPcat2"
-ucidef_set_root_password_plain "password"
+# ucidef_set_root_password_plain "password"
 ucidef_set_country "CN"
 ucidef_set_wireless "all" "zzPcat2" "psk2+ccmp" "photonicat"
 
