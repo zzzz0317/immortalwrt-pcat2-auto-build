@@ -53,7 +53,7 @@ local charger_online = read_int_file("/sys/class/power_supply/charger/online", "
 -- 风扇信息
 local fan_cur_state = read_int_file("/sys/class/thermal/cooling_device0/cur_state", "0")
 local fan_max_state = read_int_file("/sys/class/thermal/cooling_device0/max_state", "0")
-local fan_speed = read_int_file("/sys/class/hwmon/hwmon3/fan1_input", "0")
+local fan_speed = read_int_file("/sys/class/hwmon/hwmon9/fan1_input", "0")
 
 -- 主板温度
 local mb_temp = read_int_file("/sys/class/hwmon/hwmon2/temp1_input", "0")
