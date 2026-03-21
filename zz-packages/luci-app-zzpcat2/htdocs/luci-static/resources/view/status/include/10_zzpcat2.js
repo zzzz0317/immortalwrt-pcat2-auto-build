@@ -94,10 +94,10 @@ return baseclass.extend({
 
 		var thermalTable = E('table', { 'class': 'table' }, [
 			E('tr', { 'class': 'tr table-titles' }, [
-				E('th', { 'class': 'th' }, _('Name')),
+				E('th', { 'class': 'th', 'width': '33%' }, _('Name')),
 				E('th', { 'class': 'th' }, _('Temp')),
-				E('th', { 'class': 'th' }, _('Passive')),
-				E('th', { 'class': 'th' }, _('Critical'))
+				// E('th', { 'class': 'th' }, _('Passive')),
+				// E('th', { 'class': 'th' }, _('Critical'))
 			])
 		]);
 
@@ -119,8 +119,8 @@ return baseclass.extend({
 				thermalTable.appendChild(E('tr', { 'class': 'tr' }, [
 					E('td', { 'class': 'td' }, zone.name),
 					E('td', { 'class': 'td' }, temp),
-					E('td', { 'class': 'td' }, passive),
-					E('td', { 'class': 'td' }, critical)
+					// E('td', { 'class': 'td' }, passive),
+					// E('td', { 'class': 'td' }, critical)
 				]));
 			});
 		}
