@@ -1,0 +1,10 @@
+{
+	"luci-app-zzpcat2": {
+		"description": "Grant access to photonicat 2 power info",
+		"read": {
+			"ubus": {
+				"luci.zzpcat2": [ "*" ]
+			}
+		}
+	}
+}

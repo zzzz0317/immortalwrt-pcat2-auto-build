@@ -1,0 +1,69 @@
+#!/bin/sh
+
+. /usr/share/libubox/jshn.sh
+
+read_sys_val() {
+	local val
+	val=$(cat "$1" 2>/dev/null)
+	echo "${val:-null}"
+}
+
+get_first_sys_val() {
+	local val
+	val=$(cat $1 2>/dev/null | head -n 1)
+	echo "${val:-null}"
+}
+
+case "$1" in
+	list)
+		echo '{ "get_power_info": { } }'
+		;;
+	call)
+		case "$2" in
+			get_power_info)
+				json_init
+				
+				# Battery
+				json_add_string bat_capacity "$(read_sys_val /sys/class/power_supply/battery/capacity)"
+				json_add_string bat_current "$(read_sys_val /sys/class/power_supply/battery/current_now)"
+				json_add_string bat_voltage "$(read_sys_val /sys/class/power_supply/battery/voltage_now)"
+				json_add_string bat_voltage_max "$(read_sys_val /sys/class/power_supply/battery/voltage_max_design)"
+				json_add_string bat_voltage_min "$(read_sys_val /sys/class/power_supply/battery/voltage_min_design)"
+				json_add_string bat_power "$(read_sys_val /sys/class/power_supply/battery/power_now)"
+				
+				# Charger
+				json_add_string chg_voltage "$(read_sys_val /sys/class/power_supply/charger/voltage_now)"
+				json_add_string chg_online "$(read_sys_val /sys/class/power_supply/charger/online)"
+				
+				# Cooling & Fan
+				json_add_string fan_cur_state "$(read_sys_val /sys/class/thermal/cooling_device0/cur_state)"
+				json_add_string fan_max_state "$(read_sys_val /sys/class/thermal/cooling_device0/max_state)"
+				json_add_string fan_rpm "$(get_first_sys_val "/sys/class/hwmon/hwmon*/fan1_input")"
+				
+				# MB Temp
+				json_add_string mb_temp "$(read_sys_val "/sys/class/hwmon/hwmon8/temp1_input")"
+				
+				# Backlight
+				json_add_string backlight "$(read_sys_val /sys/class/backlight/backlight/brightness)"
+				
+				# Thermal Zones
+				json_add_array thermal_zones
+				for zone in /sys/class/thermal/thermal_zone*; do
+					if [ -d "$zone" ]; then
+						json_add_object ""
+						json_add_string name "$(read_sys_val "$zone/type")"
+						json_add_string temp "$(read_sys_val "$zone/temp")"
+						json_add_string trip_point_0_temp "$(read_sys_val "$zone/trip_point_0_temp")"
+						json_add_string trip_point_0_type "$(read_sys_val "$zone/trip_point_0_type")"
+						json_add_string trip_point_1_temp "$(read_sys_val "$zone/trip_point_1_temp")"
+						json_add_string trip_point_1_type "$(read_sys_val "$zone/trip_point_1_type")"
+						json_close_object
+					fi
+				done
+				json_close_array
+				
+				json_dump
+				;;
+		esac
+		;;
+esac
