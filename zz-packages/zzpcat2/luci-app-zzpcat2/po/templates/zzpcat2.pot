@@ -1,0 +1,50 @@
+msgid "Power Information"
+msgstr ""
+
+msgid "Battery Capacity"
+msgstr ""
+
+msgid "Battery Voltage"
+msgstr ""
+
+msgid "Battery Current"
+msgstr ""
+
+msgid "Battery Power"
+msgstr ""
+
+msgid "Charger Voltage"
+msgstr ""
+
+msgid "Charger State"
+msgstr ""
+
+msgid "Connected"
+msgstr ""
+
+msgid "Disconnected"
+msgstr ""
+
+msgid "Fan State"
+msgstr ""
+
+msgid "Fan RPM"
+msgstr ""
+
+msgid "Motherboard Temp"
+msgstr ""
+
+msgid "Backlight"
+msgstr ""
+
+msgid "No power information available"
+msgstr ""
+
+msgid "Thermal Zones"
+msgstr ""
+
+msgid "Name"
+msgstr ""
+
+msgid "Temp"
+msgstr ""

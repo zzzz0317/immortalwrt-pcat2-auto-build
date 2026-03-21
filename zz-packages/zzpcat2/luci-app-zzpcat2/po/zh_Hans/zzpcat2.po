@@ -1,0 +1,50 @@
+msgid "Power Information"
+msgstr "电源信息"
+
+msgid "Battery Capacity"
+msgstr "电池容量"
+
+msgid "Battery Voltage"
+msgstr "电池电压"
+
+msgid "Battery Current"
+msgstr "电池电流"
+
+msgid "Battery Power"
+msgstr "电池功率"
+
+msgid "Charger Voltage"
+msgstr "充电器电压"
+
+msgid "Charger State"
+msgstr "充电器状态"
+
+msgid "Connected"
+msgstr "已连接"
+
+msgid "Disconnected"
+msgstr "未连接"
+
+msgid "Fan State"
+msgstr "风扇档位"
+
+msgid "Fan RPM"
+msgstr "风扇转速"
+
+msgid "Motherboard Temp"
+msgstr "主板温度"
+
+msgid "Backlight"
+msgstr "背光亮度"
+
+msgid "No power information available"
+msgstr "暂无电源信息"
+
+msgid "Thermal Zones"
+msgstr "温度区域"
+
+msgid "Name"
+msgstr "名称"
+
+msgid "Temp"
+msgstr "温度"
