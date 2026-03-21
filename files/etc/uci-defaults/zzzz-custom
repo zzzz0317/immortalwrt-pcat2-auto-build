@@ -69,6 +69,11 @@ if [ -n "$STOR_SELECTED_DEVICE" ]; then
     fi
     uci set bandix.general.data_dir="$STOR_SELECTED_TARGET/bandix"
     uci commit bandix
+    if [ ! -d "$STOR_SELECTED_TARGET/docker" ]; then
+        mkdir -p "$STOR_SELECTED_TARGET/docker"
+    fi
+    uci set dockerd.globals.data_root="$STOR_SELECTED_TARGET/docker"
+    uci commit dockerd
 else
     echo "persistent dev not found" >> /tmp/zz-init.log
 fi
@@ -84,6 +89,7 @@ uci set bandix.dns.dns_flush_interval='300'
 uci set bandix.traffic.traffic_realtime_window='1800'
 uci commit bandix
 /etc/init.d/bandix restart
+/etc/init.d/dockerd restart
 
 /etc/init.d/pcat2-display-mini enable
 /etc/init.d/pcat2-display-mini start
