@@ -17,3 +17,9 @@
 [submodule "zz-packages/theme/luci-app-aurora-config"]
 	path = zz-packages/theme/luci-app-aurora-config
 	url = https://github.com/eamonxg/luci-app-aurora-config.git
+[submodule "zz-packages/bandix/luci-app-bandix-plus"]
+	path = zz-packages/bandix/luci-app-bandix-plus
+	url = https://github.com/timsaya/luci-app-bandix-plus.git
+[submodule "zz-packages/bandix/openwrt-bandix-plus"]
+	path = zz-packages/bandix/openwrt-bandix-plus
+	url = https://github.com/timsaya/openwrt-bandix-plus.git
