@@ -69,6 +69,11 @@ if [ -n "$STOR_SELECTED_DEVICE" ]; then
     fi
     uci set bandix.general.data_dir="$STOR_SELECTED_TARGET/bandix"
     uci commit bandix
+    if [ ! -d "$STOR_SELECTED_TARGET/bandix-plus" ]; then
+        mkdir -p "$STOR_SELECTED_TARGET/bandix-plus"
+    fi
+    uci set bandix_plus.general.data_dir="$STOR_SELECTED_TARGET/bandix-plus"
+    uci commit bandix_plus
     if [ ! -d "$STOR_SELECTED_TARGET/docker" ]; then
         mkdir -p "$STOR_SELECTED_TARGET/docker"
     fi
@@ -79,16 +84,23 @@ else
 fi
 
 uci del bandix.traffic.traffic_neighbor_flush_interval
-uci set bandix.traffic.enabled='1'
+uci set bandix.traffic.enabled='0'
 uci set bandix.traffic.traffic_enable_storage='1'
-uci set bandix.connections.enabled='1'
-uci set bandix.dns.enabled='1'
+uci set bandix.connections.enabled='0'
+uci set bandix.dns.enabled='0'
 uci set bandix.dns.dns_enable_storage='1'
 uci set bandix.traffic.traffic_flush_interval='300'
 uci set bandix.dns.dns_flush_interval='300'
 uci set bandix.traffic.traffic_realtime_window='1800'
 uci commit bandix
+
+uci del bandix_plus.general.tc_order
+uci del bandix_plus.general.netlink_priority
+uci set bandix_plus.general.traffic_enable_storage='1'
+uci commit bandix_plus
+
 /etc/init.d/bandix restart
+/etc/init.d/bandix-plus restart
 /etc/init.d/dockerd restart
 
 /etc/init.d/pcat2-display-mini enable
