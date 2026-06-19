@@ -1,9 +1,11 @@
 [submodule "zz-packages/bandix/luci-app-bandix"]
 	path = zz-packages/bandix/luci-app-bandix
 	url = https://github.com/timsaya/luci-app-bandix.git
+	branch = main
 [submodule "zz-packages/bandix/openwrt-bandix"]
 	path = zz-packages/bandix/openwrt-bandix
 	url = https://github.com/timsaya/openwrt-bandix.git
+	branch = main
 [submodule "zz-packages/theme/luci-theme-alpha"]
 	path = zz-packages/theme/luci-theme-alpha
 	url = https://github.com/derisamedia/luci-theme-alpha.git
@@ -11,15 +13,20 @@
 [submodule "zz-packages/theme/luci-theme-aurora"]
 	path = zz-packages/theme/luci-theme-aurora
 	url = https://github.com/eamonxg/luci-theme-aurora.git
+	branch = master
 [submodule "zz-packages/theme/luci-theme-glass"]
 	path = zz-packages/theme/luci-theme-glass
 	url = https://github.com/rchen14b/luci-theme-glass.git
+	branch = main
 [submodule "zz-packages/theme/luci-app-aurora-config"]
 	path = zz-packages/theme/luci-app-aurora-config
 	url = https://github.com/eamonxg/luci-app-aurora-config.git
+	branch = master
 [submodule "zz-packages/bandix/luci-app-bandix-plus"]
 	path = zz-packages/bandix/luci-app-bandix-plus
 	url = https://github.com/timsaya/luci-app-bandix-plus.git
+	branch = main
 [submodule "zz-packages/bandix/openwrt-bandix-plus"]
 	path = zz-packages/bandix/openwrt-bandix-plus
 	url = https://github.com/timsaya/openwrt-bandix-plus.git
+	branch = main
