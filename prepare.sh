@@ -5,8 +5,8 @@ free -h
 cat /proc/cpuinfo
 
 echo "update submodules"
-# git submodule update --init --recursive --remote || { echo "submodule update failed"; exit 1; }
-git submodule update --init --recursive || { echo "submodule init failed"; exit 1; }
+git submodule update --init --recursive --remote || { echo "submodule update failed"; exit 1; }
+# git submodule update --init --recursive || { echo "submodule init failed"; exit 1; }
 
 if [ -d "immortalwrt" ]; then
     echo "repo dir exists"
@@ -29,8 +29,9 @@ echo "add feeds"
 cat feeds.conf.default > feeds.conf
 echo "" >> feeds.conf
 # echo "src-git qmodem https://github.com/FUjr/QModem.git;main" >> feeds.conf
+echo "src-git qmodem https://github.com/FUjr/QModem.git;v3.3.0" >> feeds.conf
 # echo "src-git qmodem https://github.com/zzzz0317/QModem.git;v2.8.11" >> feeds.conf
-echo "src-git qmodem https://github.com/zzzz0317/QModem.git;v3.1.0" >> feeds.conf
+# echo "src-git qmodem https://github.com/zzzz0317/QModem.git;v3.1.0" >> feeds.conf
 echo "update files"
 rm -rf files
 cp -r ../files .
